@@ -1,107 +1,124 @@
-WordPress Custom Post Type - Knowledge Hub
-This WordPress theme/plugin is designed to add a custom post type, custom taxonomies, custom meta boxes, and provide REST API endpoints for the Knowledge Hub. The theme/plugin also integrates shortcodes and WP AJAX functionality to extend the WordPress experience. The code in this repository helps developers easily register custom content types, taxonomies, and meta data fields to enhance content management in WordPress.
-
-Features
-Custom Post Type
-A custom post type (CPT) named Knowledge Hub is dynamically registered and configured.
-
-Allows hierarchical content (like pages) for better organization.
-Can have its own archive page.
-Linked with the default WordPress category taxonomy for classification.
-Custom Taxonomy
-A custom taxonomy named Literature Genre is created specifically for the Knowledge Hub posts.
-
-Supports hierarchical taxonomies (like categories).
-Custom taxonomy can be associated with Knowledge Hub posts.
-Custom Meta Boxes
-Dynamic meta boxes are added to the Knowledge Hub custom post type for additional content fields.
-
-Content Type (taxonomy-based): Allows multiple selections from the Literature Genre taxonomy.
-Category (taxonomy-based): Allows multiple selections from the default WordPress categories.
-Ratings (numeric field): Accepts a number between 1 and 10 for rating the content.
-Author Name (text field): To store the name(s) of authors contributing to the content.
-WP AJAX
-AJAX functionality for dynamic content loading is available via wp_ajax for an enhanced user experience.
-
-Shortcode Integration
-Shortcodes are provided to dynamically render and display content wherever required.
-
+Overview
+This WordPress project implements a Knowledge Hub custom post type (CPT) and various features like custom taxonomies, metaboxes, AJAX functionality, shortcodes, and REST API integration. The Knowledge Hub is designed to display articles or resources related to different topics and genres.
+This document provides a detailed explanation of how to set up, use, and extend this project.
+Files and Structure
+The project consists of several PHP files that are included in your theme. These files are located in the include folder of the theme:
+    1. register_post_types.php: Contains the code for registering custom post types (CPT).
+    2. register_taxonomies.php: Contains the code for registering taxonomies associated with the CPT.
+    3. register_meta_boxes.php: Defines the metaboxes for the custom post type.
+    4. wp_ajax.php: Handles AJAX requests for dynamic functionality.
+    5. shortcode.php: Registers WordPress shortcodes.
+    6. wp_rest_api.php: Defines custom REST API endpoints for the Knowledge Hub CPT.
+Custom Post Type (CPT) – Knowledge Hub
+The Knowledge Hub CPT is dynamically created using the following code:
+php
+Copy
+add_filter("register_custom_posts", "add_custom_post_types");
+function add_custom_post_types($args){
+    $args["labels"]["name"] = "Knowledge Hub";
+    $args["args"]["taxonomies"] = array("category");
+    $args["args"]["hierarchical"] = true;
+    $args["args"]["has_archive"] = true;
+    return $args;
+}
+This creates a post type named Knowledge Hub that supports hierarchical structure, categories, and an archive page.
+Custom Taxonomy – Literature Genre
+The Literature Genre taxonomy is dynamically added for the Knowledge Hub CPT using this code:
+php
+Copy
+add_filter("register_taxonomies", "add_custom_taxonomy");
+function add_custom_taxonomy($args){
+    $args["labels"]["name"] = "Literature Genre";
+    $args["post_types"] = "knowledge_hub";
+    $args["args"]["rewrite"] = array( 'slug' => 'literature_genre', 'with_front' => true, 'hierarchical' => true );
+    return $args;
+}
+This taxonomy is used to classify the Knowledge Hub posts into different genres.
+Metaboxes for Knowledge Hub
+Metaboxes are used to add custom fields to the Knowledge Hub CPT. The following metaboxes are defined:
+php
+Copy
+add_filter("register_post_mb", "add_cpt_meta_boxes");
+function add_cpt_meta_boxes($cpt_args){
+    $cpt_args["mb_name"] = "MB Knowledge Hub";
+    $cpt_args["post_type"] = "knowledge_hub";
+    $cpt_args["position"] = "normal";
+    $cpt_args["fields"] = array(
+        "taxonomy" => array(
+            array(
+                "taxonomy" => "literature_genre",
+                "name" => "tax_content_type",
+                "id" => "tax_content_type",
+                "is_multiple" => true,
+                "is_label" => true,
+                "label" => "Content Type",
+            ),
+            array(
+                "taxonomy" => "category",
+                "name" => "tax_category",
+                "id" => "tax_category",
+                "is_multiple" => true,
+                "is_label" => true,
+                "label" => "Category",
+            )
+        ),
+        "input" => array(
+            array(
+                "type" => "number",
+                "name" => "ratings",
+                "id" => "ratings",
+                "is_label" => true,
+                "label" => "Ratings",
+                "placeholder" => "Rating 1 - 10",
+                "min" => "1",
+                "max" => "10",
+            ),
+            array(
+                "type" => "text",
+                "name" => "author_name",
+                "id" => "author_name",
+                "is_label" => true,
+                "label" => "Authors",
+                "placeholder" => "Author name",
+            ),
+        )
+    );
+    return $cpt_args;
+}
+This code adds two taxonomies (Content Type and Category) and two custom fields (Ratings and Author Name) to the post editor.
+WordPress AJAX
+The AJAX functionality is included in wp_ajax.php. This file defines custom AJAX functions for the site. You can trigger specific actions (e.g., fetch posts dynamically) using AJAX calls.
+Shortcodes
+The shortcode.php file is used to define shortcodes that can be inserted into posts, pages, or widgets. You can create reusable content blocks with this feature.
 REST API Endpoints
-Custom REST API endpoints are created to interact with Knowledge Hub posts. These endpoints support the following functionalities:
+Custom REST API endpoints are created in wp_rest_api.php to fetch Knowledge Hub posts in various ways. The following endpoints are available:
+    • Get all posts (paged):
+      bash
+      Copy
+      http://localhost:10043/wp-json/cpt/v2/knowledge_hub/page/<page-number>
+      Fetch posts for a specific page.
+    • Get a post by its ID:
+      bash
+      Copy
+      http://localhost:10043/wp-json/cpt/v2/knowledge_hub/<id>
+      Fetch a specific post by its ID.
+    • Get posts by term slug (Literature Genre):
+      bash
+      Copy
+      http://localhost:10043/wp-json/cpt/v2/knowledge_hub/term/<term-slug>
+      Fetch posts that belong to a specific term (e.g., genre) in the literature_genre taxonomy.
+    • Get posts by meta key:
+      bash
+      Copy
+      http://localhost:10043/wp-json/cpt/v2/knowledge_hub/meta/<meta-key>
+      Fetch posts based on a specific custom field value.
+Installation and Setup
+    1. Upload the theme to your WordPress installation.
+    2. Ensure the necessary files are included within the theme (referenced above).
+    3. Activate the theme through the WordPress dashboard.
+    4. You can now create new Knowledge Hub posts, assign genres and categories, and view the posts through the WordPress admin interface.
+Extending the Project
+    • You can add more custom fields to the Knowledge Hub CPT by modifying the add_cpt_meta_boxes() function.
+    • To add more taxonomies, use the add_custom_taxonomy() function to create and register them.
+    • Customize the REST API responses by extending the code in the wp_rest_api.php file.
 
-Get all posts by page number (pagination).
-Get a specific post by ID.
-Get posts by taxonomy term (slug).
-Get posts by meta key.
-Installation
-To install this feature on your WordPress site, follow the steps below:
-
-Download the theme or plugin zip file.
-In your WordPress dashboard, go to Appearance → Themes (or Plugins → Add New if you're adding it as a plugin).
-Click Upload and select the zip file to upload and install it.
-Once installed, activate the theme or plugin.
-Ensure that any custom post types, taxonomies, and meta boxes are properly initialized by checking the relevant settings in the WordPress admin.
-Code Walkthrough
-The project is divided into multiple files, each responsible for different features:
-
-1. Register Custom Post Types (Post Types)
-Path: include/register_post_types.php
-This file contains the logic to register the Knowledge Hub custom post type. It is configured to support categories and has its own archive page.
-2. Register Custom Taxonomies (Taxonomies)
-Path: include/register_taxonomies.php
-Defines a custom taxonomy Literature Genre and associates it with the Knowledge Hub post type.
-3. Register Meta Boxes (Meta Boxes)
-Path: include/register_meta_boxes.php
-Adds meta boxes for the Knowledge Hub post type to capture custom fields such as ratings, author names, and taxonomy selections.
-4. WP AJAX (AJAX)
-Path: include/wp_ajax.php
-Handles AJAX requests for dynamically loading content without page reloads.
-5. Shortcodes (Shortcodes)
-Path: include/shortcode.php
-Includes shortcodes to render content dynamically on pages/posts.
-6. REST API (REST API)
-Path: include/wp_rest_api.php
-Custom REST API endpoints to interact with the Knowledge Hub posts. These allow for retrieving posts by page, post ID, taxonomy term, and meta key.
-REST API Endpoints
-The following custom REST API endpoints are available for interacting with Knowledge Hub posts:
-
-Get All Posts on a Specific Page
-
-bash
-Copy
-GET http://localhost:10043/wp-json/cpt/v2/knowledge_hub/page/<page-number>
-Fetches a paginated list of all Knowledge Hub posts.
-Get a Single Post by Post ID
-
-bash
-Copy
-GET http://localhost:10043/wp-json/cpt/v2/knowledge_hub/<id>
-Fetches the Knowledge Hub post with the specified post ID.
-Get Posts by Taxonomy Term (Slug)
-
-bash
-Copy
-GET http://localhost:10043/wp-json/cpt/v2/knowledge_hub/term/<term-slug>
-Fetches posts associated with a specific taxonomy term (e.g., Literature Genre).
-Get Posts by Meta Key
-
-bash
-Copy
-GET http://localhost:10043/wp-json/cpt/v2/knowledge_hub/meta/<meta-key>
-Fetches posts filtered by a specific meta key (e.g., Ratings or Author Name).
-Example Use Cases
-Example 1: Displaying posts based on a specific taxonomy term.
-
-Use the REST API endpoint to fetch all posts related to a specific term and display them on your website.
-Example 2: Get posts based on rating or author names.
-
-You can query the API to fetch all posts with a certain rating or authored by a specific person.
-Example 3: Displaying Knowledge Hub content on custom pages via shortcodes.
-
-Use the provided shortcodes to display Knowledge Hub posts directly within WordPress pages.
-Customization
-The plugin allows easy customization:
-
-Modify Labels: You can change the display names of the Knowledge Hub post type or Literature Genre taxonomy by updating the labels array in the corresponding functions.
-Custom Meta Fields: You can easily add more fields to the meta boxes by extending the $cpt_args["fields"] array.
-Taxonomies: You can adjust the relationship of post types and taxonomies based on your requirements by modifying the register_taxonomy arguments.
