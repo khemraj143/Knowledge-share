@@ -1,0 +1,34 @@
+.wp-section {
+    display: flex;
+    width: 100%;
+    align-items: center;
+}
+.blocks {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 25px;
+}
+h2 {
+    font-size: 30px;
+    font-weight: 600;
+}
+.content {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+.cpt-item {
+    background-color: #f7f7f7;
+    padding: 20px 25px;
+    border-radius: 10px;
+}
+.item-title {
+    font-size: 20px;
+    font-weight: 700;
+    padding-bottom: 15px;
+}
+.item-content {
+    font-size: 16px;
+    font-weight: 500;
+}

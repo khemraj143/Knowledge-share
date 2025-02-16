@@ -1,0 +1,30 @@
+.edit-post-meta-boxes-area #poststuff .postbox .postbox-header > h2{
+    font-size: 22px;
+    font-weight: 600;
+    color: #FFF;
+}
+.edit-post-meta-boxes-area #poststuff .postbox .postbox-header{
+    background-color: black;
+}
+.edit-post-meta-boxes-area #poststuff .postbox .inside{
+    padding: 20px 30px;
+}
+.postbox .mb_post_box{
+    display: flex;
+    gap: 20px;
+    flex-direction: column;
+    justify-content: center;
+}
+.postbox .mb_post_box .mb-elements{
+    display: flex;
+    gap: 20px;
+}
+.postbox .mb_post_box .mb-elements label{
+    width: 100px;
+    font-size: 15px;
+    font-weight: 600;
+}
+.postbox .mb_post_box input, .postbox .mb_post_box select, .postbox .mb_post_box .select2-container-multi{
+    width: 400px;
+    height: 35px;
+}
